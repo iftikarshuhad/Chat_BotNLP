@@ -1,0 +1,67 @@
+import nltk
+import io
+import numpy as np
+import random
+import warnings
+import string
+
+warnings.filterwarnings('ignore')
+
+f=open('MyNLTK.txt','r',errors='ignore')
+r=f.read()
+r=r.lower()
+nltk.download('punkt')
+nltk.download('wordnet')
+
+sent_tok=nltk.sent_tokenize(r)
+word_tok=nltk.word_tokenize(r)
+lem=nltk.stem.WordNetLemmatizer()
+def LemTokens(tokens):
+    return [lem.lemmatize(token for token in tokens)]
+remove_punc=dict((ord(punkt),None) for punkt in string.punctuation)
+def LemNormalize(text):
+    return LemTokens(nltk.word_tokenize(text.lower()).translate(remove_punc))
+Greeting_user={"hi","hello","greetings","what's up","hey"}
+Greeting_reply={"hey","yes","I am good","yo","lo"}
+def greeting(sentence):
+    for word in sentence.split():
+        if word.lower() in Greeting_user:
+            return random.choice(Greeting_reply)
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+def response(user_response):
+    chatbot_response=''
+    sent_tok.append(user_response)
+    TfidfVec=TfidfVectorizer(tokenizer=LemNormalize,stop_words='english')
+    tfidf=TfidVec.fit_transform(sent_tok)
+    vals=sosine_similarity(tfidf[-1],tfidf)
+    idx=vals.argsort()[0][-2]
+    flat=vals.flatten()
+    flat.sort
+    req_tfidf=flat[-2]
+    if(req_tfidf==0):
+        chatbot_response=chatbot_response+"I am sorry! I do't understand you"
+        return chatbot_responce
+    else:
+        chatbot_response=chatbot_response+sent_tokens[idx]
+        return chatbot_responce
+    flag=True
+print("Hello, I am Iftikar's Chatbot, for exit type Go")
+while(flag==True):
+    user_response=input()
+    user_response=user_response.lower()
+    if(user_response!='go'):
+        if(user_response=='thanks' or user_response=='thank you'):
+            flag=False
+            print("Chatbot:You are Welcome")
+        else:
+            if(greeting(user_response)!=None):
+                print("Chatbot: "+greeting(user_response))
+            else:
+                print("Chatbot: ",end="")
+                print(response(user_response))
+                sent_tok.remove(user_response)
+    else:
+        flag=False
+        print("Chatbot: Bye Go now")
